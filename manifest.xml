@@ -15,9 +15,5 @@
       <iq:uses-permission id="Communications"/>
     </iq:permissions>
 
-    <iq:launchericon>
-      <iq:icon drawable="launcher_icon"/>
-    </iq:launchericon>
-
   </iq:application>
 </iq:manifest>
