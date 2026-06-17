@@ -1,5 +1,6 @@
 // StepRunnerView.mc — Static step-by-step workout runner
 // View + BehaviorDelegate
+// All target labels use concrete HR/pace, no zone notation
 
 using Toybox.WatchUi;
 using Toybox.Graphics as Gfx;
@@ -28,41 +29,37 @@ class StepRunnerView extends WatchUi.View {
         var w = dc.getWidth();
         var h = dc.getHeight();
 
-        // ---- Header ----
+        // ---- Header: workout type ----
         dc.setColor(0xD4A84B, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, 12, Gfx.FONT_SYSTEM_TINY, _type.toUpper(), Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(w / 2, 18, Gfx.FONT_SYSTEM_MEDIUM, _type, Gfx.TEXT_JUSTIFY_CENTER);
 
         // ---- Step counter ----
         var stepNum = _currentStep + 1;
-        var stepStr = Lang.format("$1$ / $2$", [stepNum.format("%d"), _numSteps.format("%d")]);
-        dc.setColor(0x888888, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, 30, Gfx.FONT_SYSTEM_TINY, stepStr, Gfx.TEXT_JUSTIFY_CENTER);
+        var stepStr = stepNum.format("%d") + " / " + _numSteps.format("%d");
+        dc.setColor(0x666666, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, 48, Gfx.FONT_SYSTEM_TINY, stepStr, Gfx.TEXT_JUSTIFY_CENTER);
 
         // ---- Divider ----
         dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
-        dc.drawLine(40, 48, w - 40, 48);
+        dc.drawLine(40, 65, w - 40, 65);
 
         if (_currentStep < _numSteps) {
             var idx = 1 + _currentStep * 3;
             var name = _steps[idx];
             var dur  = _steps[idx + 1];
-            var zone = _steps[idx + 2];
+            var tgt  = _steps[idx + 2];
 
             // ---- Big step name ----
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, 70, Gfx.FONT_SYSTEM_MEDIUM, name, Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(w / 2, 85, Gfx.FONT_SYSTEM_MEDIUM, name, Gfx.TEXT_JUSTIFY_CENTER);
 
             // ---- Big duration display ----
             dc.setColor(0xD4A84B, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, 110, Gfx.FONT_SYSTEM_LARGE, dur, Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(w / 2, 125, Gfx.FONT_SYSTEM_LARGE, dur, Gfx.TEXT_JUSTIFY_CENTER);
 
-            // ---- Zone label ----
+            // ---- Target label (HR or pace) ----
             dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, 150, Gfx.FONT_SYSTEM_SMALL, zone, Gfx.TEXT_JUSTIFY_CENTER);
-
-            // ---- Divider before nav ----
-            dc.setColor(0x333333, Gfx.COLOR_TRANSPARENT);
-            dc.drawLine(40, 180, w - 40, 180);
+            dc.drawText(w / 2, 170, Gfx.FONT_SYSTEM_SMALL, tgt, Gfx.TEXT_JUSTIFY_CENTER);
 
             // ---- Navigation hint ----
             var isLastStep = (_currentStep == _numSteps - 1);
