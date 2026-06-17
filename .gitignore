@@ -1,0 +1,10 @@
+# Build output
+bin/*.prg
+bin/*.prg.debug
+
+# Developer key — NEVER commit
+*.der
+*.pem
+
+# SDK cache
+.sdkmanager/
