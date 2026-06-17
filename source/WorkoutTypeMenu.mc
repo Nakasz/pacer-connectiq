@@ -1,21 +1,21 @@
 // WorkoutTypeMenu.mc — Confirmation after type selection
-// Shows workout type name + short description, user confirms to view full workout
+// View + BehaviorDelegate — buttons handled by WorkoutTypeDelegate
 
 using Toybox.WatchUi;
 using Toybox.Graphics as Gfx;
+using Toybox.System;
 
 class WorkoutTypeMenu extends WatchUi.View {
 
     var _type;
     var _description;
-    var _selectedOption; // 0 = Yes, 1 = No
+    var _selectedOption; // 0 = Yes(View), 1 = No(Back)
 
     function initialize(type) {
         View.initialize();
         _type = type;
         _selectedOption = 0;
 
-        // Static descriptions per type
         if (type.equals("Easy")) {
             _description = "Low intensity aerobic";
         } else if (type.equals("Tempo")) {
@@ -62,14 +62,12 @@ class WorkoutTypeMenu extends WatchUi.View {
         var startX = (w - totalW) / 2;
         var btnY = 180;
 
-        // Yes button
         var yesSelected = (_selectedOption == 0);
         dc.setColor(yesSelected ? 0xD4A84B : 0x444444, yesSelected ? 0x332200 : Gfx.COLOR_BLACK);
         dc.fillRectangle(startX, btnY, btnW, btnH);
         dc.setColor(yesSelected ? Gfx.COLOR_WHITE : 0x888888, Gfx.COLOR_TRANSPARENT);
         dc.drawText(startX + btnW / 2, btnY + 8, Gfx.FONT_SYSTEM_SMALL, "View", Gfx.TEXT_JUSTIFY_CENTER);
 
-        // No button
         var noSelected = (_selectedOption == 1);
         var noX = startX + btnW + gap;
         dc.setColor(noSelected ? 0xCCCCCC : 0x444444, noSelected ? 0x222222 : Gfx.COLOR_BLACK);
@@ -81,43 +79,6 @@ class WorkoutTypeMenu extends WatchUi.View {
         dc.setColor(0x555555, Gfx.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h - 22, Gfx.FONT_SYSTEM_TINY, "UP/DOWN  |  START confirm", Gfx.TEXT_JUSTIFY_CENTER);
     }
-
-    // ---- Button input ----
-
-    function onKey(keyEvent) {
-
-        var key = keyEvent.getKey();
-
-        if (key == WatchUi.KEY_DOWN || key == WatchUi.KEY_UP) {
-            _selectedOption = _selectedOption == 0 ? 1 : 0;
-            WatchUi.requestUpdate();
-            return true;
-        }
-
-        if (key == WatchUi.KEY_ENTER) {
-            if (_selectedOption == 0) {
-                // View workout → push preview
-                WatchUi.pushView(
-                    new WorkoutPreviewView(_type),
-                    null,
-                    WatchUi.SLIDE_IMMEDIATE
-                );
-            } else {
-                // Back → pop
-                WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-            }
-            return true;
-        }
-
-        if (key == WatchUi.KEY_ESC) {
-            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-            return true;
-        }
-
-        return false;
-    }
-
-    // ---- Touch input ----
 
     function onTap(clickEvent) {
         var coords = clickEvent.getCoordinates();
@@ -131,25 +92,74 @@ class WorkoutTypeMenu extends WatchUi.View {
         var startX = (w - totalW) / 2;
         var btnY = 180;
 
-        // Check Y range
         if (y < btnY || y > btnY + btnH) {
             return false;
         }
 
-        // Yes button
         if (x >= startX && x <= startX + btnW) {
             _selectedOption = 0;
-            WatchUi.pushView(new WorkoutPreviewView(_type), null, WatchUi.SLIDE_IMMEDIATE);
+            WatchUi.requestUpdate();
             return true;
         }
 
-        // No button
         var noX = startX + btnW + gap;
         if (x >= noX && x <= noX + btnW) {
-            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+            _selectedOption = 1;
+            WatchUi.requestUpdate();
             return true;
         }
 
         return false;
+    }
+}
+
+// ---- BehaviorDelegate for WorkoutTypeMenu ----
+
+class WorkoutTypeDelegate extends WatchUi.BehaviorDelegate {
+
+    var _view;
+
+    function initialize(view) {
+        BehaviorDelegate.initialize();
+        _view = view;
+    }
+
+    function onNextPage() {
+        System.println("onNextPage");
+        _view._selectedOption = 1;
+        WatchUi.requestUpdate();
+        return true;
+    }
+
+    function onPreviousPage() {
+        System.println("onPreviousPage");
+        _view._selectedOption = 0;
+        WatchUi.requestUpdate();
+        return true;
+    }
+
+    function onSelect() {
+        System.println("onSelect");
+        if (_view._selectedOption == 0) {
+            var previewView = new WorkoutPreviewView(_view._type);
+            WatchUi.pushView(
+                previewView,
+                new WorkoutPreviewDelegate(previewView),
+                WatchUi.SLIDE_IMMEDIATE
+            );
+        } else {
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        }
+        return true;
+    }
+
+    function onBack() {
+        System.println("onBack");
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    function onTap(clickEvent) {
+        return _view.onTap(clickEvent);
     }
 }

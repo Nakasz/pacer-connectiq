@@ -1,6 +1,5 @@
 // StepRunnerView.mc — Static step-by-step workout runner
-// Shows current step name, duration, zone, and step counter
-// ENTER = next step, BACK = return to preview
+// View + BehaviorDelegate
 
 using Toybox.WatchUi;
 using Toybox.Graphics as Gfx;
@@ -29,7 +28,7 @@ class StepRunnerView extends WatchUi.View {
         var w = dc.getWidth();
         var h = dc.getHeight();
 
-        // ---- Header: workout type ----
+        // ---- Header ----
         dc.setColor(0xD4A84B, Gfx.COLOR_TRANSPARENT);
         dc.drawText(w / 2, 12, Gfx.FONT_SYSTEM_TINY, _type.toUpper(), Gfx.TEXT_JUSTIFY_CENTER);
 
@@ -46,7 +45,7 @@ class StepRunnerView extends WatchUi.View {
         if (_currentStep < _numSteps) {
             var idx = 1 + _currentStep * 3;
             var name = _steps[idx];
-            var dur = _steps[idx + 1];
+            var dur  = _steps[idx + 1];
             var zone = _steps[idx + 2];
 
             // ---- Big step name ----
@@ -88,42 +87,6 @@ class StepRunnerView extends WatchUi.View {
         }
     }
 
-    // ---- Button input ----
-
-    function onKey(keyEvent) {
-
-        var key = keyEvent.getKey();
-
-        if (key == WatchUi.KEY_ENTER) {
-            if (_currentStep >= _numSteps) {
-                // Done → restart
-                _currentStep = 0;
-            } else {
-                _currentStep++;
-            }
-            WatchUi.requestUpdate();
-            return true;
-        }
-
-        if (key == WatchUi.KEY_UP) {
-            // Previous step (wrap)
-            if (_currentStep > 0) {
-                _currentStep--;
-                WatchUi.requestUpdate();
-            }
-            return true;
-        }
-
-        if (key == WatchUi.KEY_ESC) {
-            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-            return true;
-        }
-
-        return false;
-    }
-
-    // ---- Touch ----
-
     function onTap(clickEvent) {
         var coords = clickEvent.getCoordinates();
         var y = coords[1];
@@ -147,5 +110,47 @@ class StepRunnerView extends WatchUi.View {
         }
 
         return false;
+    }
+}
+
+// ---- BehaviorDelegate for StepRunner ----
+
+class StepRunnerDelegate extends WatchUi.BehaviorDelegate {
+
+    var _view;
+
+    function initialize(view) {
+        BehaviorDelegate.initialize();
+        _view = view;
+    }
+
+    function onSelect() {
+        System.println("onSelect (step " + _view._currentStep + ")");
+        if (_view._currentStep >= _view._numSteps) {
+            _view._currentStep = 0;
+        } else {
+            _view._currentStep++;
+        }
+        WatchUi.requestUpdate();
+        return true;
+    }
+
+    function onPreviousPage() {
+        System.println("onPreviousPage");
+        if (_view._currentStep > 0) {
+            _view._currentStep--;
+            WatchUi.requestUpdate();
+        }
+        return true;
+    }
+
+    function onBack() {
+        System.println("onBack");
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    function onTap(clickEvent) {
+        return _view.onTap(clickEvent);
     }
 }

@@ -1,5 +1,5 @@
 // WorkoutPreviewView.mc — Static workout preview with step breakdown
-// Shows workout name, duration, and step list
+// View + BehaviorDelegate
 
 using Toybox.WatchUi;
 using Toybox.Graphics as Gfx;
@@ -15,34 +15,33 @@ class WorkoutPreviewView extends WatchUi.View {
         View.initialize();
         _type = type;
 
-        // Static sample workout data per type
         if (type.equals("Easy")) {
-            _steps = [ 3, "Easy Run", "40 min", "4:30–5:00/km" ];
+            _steps = [ 3, "Easy Run", "40 min", "4:30-5:00/km" ];
         } else if (type.equals("Tempo")) {
             _steps = [
                 3,
-                "Warmup",        "12 min", "Zone 1–2",
-                "Tempo",         "25 min", "Zone 3–4",
-                "Cooldown",      "10 min", "Zone 1–2"
+                "Warmup",     "12 min", "Zone 1-2",
+                "Tempo",      "25 min", "Zone 3-4",
+                "Cooldown",   "10 min", "Zone 1-2"
             ];
         } else if (type.equals("Threshold")) {
             _steps = [
                 5,
-                "Warmup",        "12 min", "Zone 1–2",
-                "Threshold",     "8 min",  "Zone 4",
-                "Recovery",      "2 min",  "Zone 1–2",
-                "Threshold",     "8 min",  "Zone 4",
-                "Cooldown",      "10 min", "Zone 1–2"
+                "Warmup",     "12 min", "Zone 1-2",
+                "Threshold",  "8 min",  "Zone 4",
+                "Recovery",   "2 min",  "Zone 1-2",
+                "Threshold",  "8 min",  "Zone 4",
+                "Cooldown",   "10 min", "Zone 1-2"
             ];
         } else if (type.equals("Long Run")) {
-            _steps = [ 1, "Long Run", "75 min", "Zone 2–3" ];
+            _steps = [ 1, "Long Run", "75 min", "Zone 2-3" ];
         } else if (type.equals("VO2max")) {
             _steps = [
                 4,
-                "Warmup",        "15 min",  "Zone 1",
-                "6x VO2max",     "90 sec",  "Zone 4–5",
-                "6x Recovery",   "60 sec",  "Zone 1–2",
-                "Cooldown",      "10 min",  "Zone 1"
+                "Warmup",     "15 min",  "Zone 1",
+                "6x VO2max",  "90 sec",  "Zone 4-5",
+                "6x Recov",   "60 sec",  "Zone 1-2",
+                "Cooldown",   "10 min",  "Zone 1"
             ];
         } else {
             _steps = [ 0 ];
@@ -77,10 +76,9 @@ class WorkoutPreviewView extends WatchUi.View {
         for (var i = 0; i < numSteps; i++) {
             var idx = 1 + i * 3;
             var name = _steps[idx];
-            var dur = _steps[idx + 1];
+            var dur  = _steps[idx + 1];
             var zone = _steps[idx + 2];
 
-            // Step number + name
             var stepNum = Lang.format("$1$", [(i + 1).format("%02d")]);
             dc.setColor(0x888888, Gfx.COLOR_TRANSPARENT);
             dc.drawText(30, y, Gfx.FONT_SYSTEM_TINY, stepNum, Gfx.TEXT_JUSTIFY_LEFT);
@@ -88,14 +86,12 @@ class WorkoutPreviewView extends WatchUi.View {
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
             dc.drawText(65, y, Gfx.FONT_SYSTEM_SMALL, name, Gfx.TEXT_JUSTIFY_LEFT);
 
-            // Duration + zone on same line
             dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);
             var detail = dur + "  " + zone;
             dc.drawText(65, y + 14, Gfx.FONT_SYSTEM_TINY, detail, Gfx.TEXT_JUSTIFY_LEFT);
 
             y += lineH + 2;
 
-            // Line between steps
             if (i < numSteps - 1) {
                 dc.setColor(0x333333, Gfx.COLOR_TRANSPARENT);
                 dc.drawLine(30, y - 1, w - 30, y - 1);
@@ -107,46 +103,76 @@ class WorkoutPreviewView extends WatchUi.View {
         dc.drawText(w / 2, h - 22, Gfx.FONT_SYSTEM_TINY, "START to run  |  BACK to menu", Gfx.TEXT_JUSTIFY_CENTER);
     }
 
-    // ---- Button input ----
+    function onTap(clickEvent) {
+        var coords = clickEvent.getCoordinates();
+        var y = coords[1];
+        var x = coords[0];
+        var h = System.getDeviceSettings().screenHeight;
 
-    function onKey(keyEvent) {
-
-        if (keyEvent.getKey() == WatchUi.KEY_ENTER) {
-            WatchUi.pushView(
-                new StepRunnerView(_type, _steps),
-                null,
-                WatchUi.SLIDE_IMMEDIATE
-            );
+        // Bottom area = start
+        if (y > h * 0.6) {
             return true;
         }
 
-        if (keyEvent.getKey() == WatchUi.KEY_ESC) {
+        // Top-left = back
+        if (x < 100 && y < 50) {
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
             return true;
         }
 
         return false;
     }
+}
 
-    // ---- Touch input (tap START area) ----
+// ---- BehaviorDelegate for WorkoutPreview ----
+
+class WorkoutPreviewDelegate extends WatchUi.BehaviorDelegate {
+
+    var _view;
+
+    function initialize(view) {
+        BehaviorDelegate.initialize();
+        _view = view;
+    }
+
+    function onSelect() {
+        System.println("onSelect");
+        var stepView = new StepRunnerView(_view._type, _view._steps);
+        WatchUi.pushView(
+            stepView,
+            new StepRunnerDelegate(stepView),
+            WatchUi.SLIDE_IMMEDIATE
+        );
+        return true;
+    }
+
+    function onBack() {
+        System.println("onBack");
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        return true;
+    }
+
     function onTap(clickEvent) {
         var coords = clickEvent.getCoordinates();
         var y = coords[1];
+        var x = coords[0];
         var h = System.getDeviceSettings().screenHeight;
 
-        // Tapping bottom third starts
+        // Bottom tap = start
         if (y > h * 0.6) {
+            System.println("onSelect (tap)");
+            var stepView = new StepRunnerView(_view._type, _view._steps);
             WatchUi.pushView(
-                new StepRunnerView(_type, _steps),
-                null,
+                stepView,
+                new StepRunnerDelegate(stepView),
                 WatchUi.SLIDE_IMMEDIATE
             );
             return true;
         }
 
-        // Tapping top-left area pops back
-        var x = coords[0];
+        // Top-left tap = back
         if (x < 100 && y < 50) {
+            System.println("onBack (tap)");
             WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
             return true;
         }

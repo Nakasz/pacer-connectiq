@@ -15,6 +15,7 @@ class PacerApp extends Application.AppBase {
     function onStop(state) { }
 
     function getInitialView() {
-        return [ new MainMenuView() ];
+        var view = new MainMenuView();
+        return [ view, new MainMenuDelegate(view) ];
     }
 }
