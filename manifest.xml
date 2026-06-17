@@ -5,8 +5,7 @@
     name="Pacer"
     version="0.0.1"
     entry="PacerApp"
-    type="watch-app"
-    icon="launcher_icon">
+    type="watch-app">
 
     <iq:products>
       <iq:product id="fr965"/>
