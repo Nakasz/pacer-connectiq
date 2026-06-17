@@ -1,21 +1,7 @@
-# monkey.jungle — Pacer Connect IQ build config
-# Target: Forerunner 965
+project.manifest = manifest.xml
 
-project.name = Pacer
-project.type = application
+base.sourcePath = source
+base.resourcePath = resources
 
-# Source files
-project.sourceFiles = source/PacerApp.mc
-project.sourceFiles += source/MainMenuView.mc
-project.sourceFiles += source/WorkoutTypeMenu.mc
-project.sourceFiles += source/WorkoutPreviewView.mc
-project.sourceFiles += source/StepRunnerView.mc
-
-# Resource files
-project.resourcePaths = resources
-
-# Device target
-project.targetDevice = fr965
-
-# Output path
-project.output = bin/Pacer.prg
+fr965.sourcePath = source
+fr965.resourcePath = resources
