@@ -5,3 +5,5 @@ base.resourcePath = resources
 
 fr965.sourcePath = source
 fr965.resourcePath = resources
+
+project.launcherIcon = launcher_icon
