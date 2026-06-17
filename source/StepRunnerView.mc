@@ -67,11 +67,11 @@ class StepRunnerView extends WatchUi.View {
             // ---- Navigation hint ----
             var isLastStep = (_currentStep == _numSteps - 1);
 
-            dc.setColor(0x555555, Gfx.COLOR_TRANSPARENT);
+            dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
             if (isLastStep) {
-                dc.drawText(w / 2, h - 22, Gfx.FONT_SYSTEM_TINY, "START to finish  |  BACK to preview", Gfx.TEXT_JUSTIFY_CENTER);
+                dc.drawText(w / 2, h - 62, Gfx.FONT_SYSTEM_XTINY, "START finish  BACK", Gfx.TEXT_JUSTIFY_CENTER);
             } else {
-                dc.drawText(w / 2, h - 22, Gfx.FONT_SYSTEM_TINY, "START next step  |  BACK to preview", Gfx.TEXT_JUSTIFY_CENTER);
+                dc.drawText(w / 2, h - 62, Gfx.FONT_SYSTEM_XTINY, "START next  BACK", Gfx.TEXT_JUSTIFY_CENTER);
             }
 
         } else {
@@ -82,8 +82,8 @@ class StepRunnerView extends WatchUi.View {
             dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
             dc.drawText(w / 2, h / 2 + 20, Gfx.FONT_SYSTEM_SMALL, "Great work today", Gfx.TEXT_JUSTIFY_CENTER);
 
-            dc.setColor(0x555555, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, h - 22, Gfx.FONT_SYSTEM_TINY, "START to restart  |  BACK to preview", Gfx.TEXT_JUSTIFY_CENTER);
+            dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(w / 2, h - 62, Gfx.FONT_SYSTEM_XTINY, "START restart  BACK", Gfx.TEXT_JUSTIFY_CENTER);
         }
     }
 

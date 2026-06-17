@@ -76,8 +76,8 @@ class WorkoutTypeMenu extends WatchUi.View {
         dc.drawText(noX + btnW / 2, btnY + 8, Gfx.FONT_SYSTEM_SMALL, "Back", Gfx.TEXT_JUSTIFY_CENTER);
 
         // ---- Hint ----
-        dc.setColor(0x555555, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h - 22, Gfx.FONT_SYSTEM_TINY, "UP/DOWN  |  START confirm", Gfx.TEXT_JUSTIFY_CENTER);
+        dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, h - 62, Gfx.FONT_SYSTEM_XTINY, "UP/DOWN  START", Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     function onTap(clickEvent) {

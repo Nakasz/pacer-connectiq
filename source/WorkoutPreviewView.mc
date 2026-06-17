@@ -98,9 +98,9 @@ class WorkoutPreviewView extends WatchUi.View {
             }
         }
 
-        // ---- START hint ----
-        dc.setColor(0x555555, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h - 22, Gfx.FONT_SYSTEM_TINY, "START to run  |  BACK to menu", Gfx.TEXT_JUSTIFY_CENTER);
+        // ---- Hint ----
+        dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, h - 62, Gfx.FONT_SYSTEM_XTINY, "START run  BACK menu", Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     function onTap(clickEvent) {
