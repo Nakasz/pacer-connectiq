@@ -66,9 +66,6 @@ class MainMenuView extends WatchUi.View {
     // ---- Button input ----
 
     function onKey(keyEvent) {
-        if (keyEvent.getType() != WatchUi.KEY_EVENT_PRESS) {
-            return false;
-        }
 
         var key = keyEvent.getKey();
 

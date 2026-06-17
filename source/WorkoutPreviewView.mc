@@ -110,9 +110,6 @@ class WorkoutPreviewView extends WatchUi.View {
     // ---- Button input ----
 
     function onKey(keyEvent) {
-        if (keyEvent.getType() != WatchUi.KEY_EVENT_PRESS) {
-            return false;
-        }
 
         if (keyEvent.getKey() == WatchUi.KEY_ENTER) {
             WatchUi.pushView(
