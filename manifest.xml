@@ -6,11 +6,18 @@
     version="0.0.1"
     entry="PacerApp"
     type="watch-app">
+
     <iq:products>
       <iq:product id="fr965"/>
     </iq:products>
+
     <iq:permissions>
       <iq:uses-permission id="Communications"/>
     </iq:permissions>
+
+    <iq:launchericon>
+      <iq:icon drawable="launcher_icon"/>
+    </iq:launchericon>
+
   </iq:application>
 </iq:manifest>
