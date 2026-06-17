@@ -1,5 +1,5 @@
 // MainMenuView.mc — Home screen with workout type selection
-// Custom drawn list on AMOLED, BehaviorDelegate navigation + touch
+// Custom drawn list on AMOLED, UP/DOWN/ENTER/BACK navigation
 
 using Toybox.WatchUi;
 using Toybox.Graphics as Gfx;
@@ -23,68 +23,46 @@ class MainMenuView extends WatchUi.View {
         var w = dc.getWidth();
         var h = dc.getHeight();
 
+        var titleY    = 48;
+        var subtitleY = 82;
+        var listStartY = 125;
+        var rowHeight  = 34;
+        var hintY      = h - 62;
+
         // ---- Title ----
         dc.setColor(0xD4A84B, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, 28, Gfx.FONT_SYSTEM_LARGE, "PACER", Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(w / 2, titleY, Gfx.FONT_SYSTEM_MEDIUM, "PACER", Gfx.TEXT_JUSTIFY_CENTER);
 
         // ---- Subtitle ----
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, 60, Gfx.FONT_SYSTEM_TINY, "Select Workout", Gfx.TEXT_JUSTIFY_CENTER);
-
-        // ---- Divider ----
-        dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
-        dc.drawLine(40, 82, w - 40, 82);
+        dc.drawText(w / 2, subtitleY, Gfx.FONT_SYSTEM_XTINY, "Select Workout", Gfx.TEXT_JUSTIFY_CENTER);
 
         // ---- Workout list ----
-        var startY = 100;
-        var itemH = 40;
-        var itemW = w - 60;
+        var selectorH = 28;
+        var selectorW = 180;
 
         for (var i = 0; i < _types.size(); i++) {
-            var y = startY + i * (itemH + 4);
+            var y = listStartY + (i * rowHeight);
             var isSelected = (i == _selectedIndex);
 
             if (isSelected) {
-                dc.setColor(0xCCCCCC, 0xCCCCCC);
-                dc.fillRectangle(30, y - 2, itemW, itemH - 2);
-                dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+                dc.setColor(0x2A2A2A, Gfx.COLOR_TRANSPARENT);
+                dc.fillRectangle((w - selectorW) / 2, y - 2, selectorW, selectorH);
+                dc.setColor(0xD4A84B, Gfx.COLOR_TRANSPARENT);
+                dc.drawText(w / 2, y + 2, Gfx.FONT_SYSTEM_SMALL, _types[i], Gfx.TEXT_JUSTIFY_CENTER);
             } else {
-                dc.setColor(0x888888, Gfx.COLOR_TRANSPARENT);
+                dc.setColor(0x666666, Gfx.COLOR_TRANSPARENT);
+                dc.drawText(w / 2, y + 2, Gfx.FONT_SYSTEM_SMALL, _types[i], Gfx.TEXT_JUSTIFY_CENTER);
             }
-
-            dc.drawText(w / 2, y, Gfx.FONT_SYSTEM_MEDIUM, _types[i], Gfx.TEXT_JUSTIFY_CENTER);
         }
 
         // ---- Navigation hint ----
-        dc.setColor(0x555555, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h - 22, Gfx.FONT_SYSTEM_TINY, "START select | BACK exit", Gfx.TEXT_JUSTIFY_CENTER);
+        dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, hintY, Gfx.FONT_SYSTEM_XTINY, "UP/DOWN  START", Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     function onTap(clickEvent) {
-        var coords = clickEvent.getCoordinates();
-        var x = coords[0];
-        var y = coords[1];
-        var w = System.getDeviceSettings().screenWidth;
-
-        var startY = 100;
-        var itemH = 40;
-        var itemW = w - 60;
-        var margin = (w - itemW) / 2;
-
-        if (x < margin || x > w - margin) {
-            return false;
-        }
-
-        for (var i = 0; i < _types.size(); i++) {
-            var itemTop = startY + i * (itemH + 4) - 2;
-            var itemBottom = itemTop + itemH - 2;
-            if (y >= itemTop && y <= itemBottom) {
-                _selectedIndex = i;
-                WatchUi.requestUpdate();
-                return true;
-            }
-        }
-
+        // Tap not used for menu navigation — use buttons
         return false;
     }
 }
@@ -130,9 +108,5 @@ class MainMenuDelegate extends WatchUi.BehaviorDelegate {
         System.println("onBack");
         System.exit();
         return true;
-    }
-
-    function onTap(clickEvent) {
-        return _view.onTap(clickEvent);
     }
 }
