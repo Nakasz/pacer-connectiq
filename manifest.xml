@@ -5,7 +5,8 @@
     name="Pacer"
     version="0.0.1"
     entry="PacerApp"
-    type="watch-app">
+    type="watch-app"
+    launcherIcon="@Drawables.LauncherIcon">
 
     <iq:products>
       <iq:product id="fr965"/>
@@ -14,6 +15,8 @@
     <iq:permissions>
       <iq:uses-permission id="Communications"/>
     </iq:permissions>
+
+    <iq:languages/>
 
   </iq:application>
 </iq:manifest>
