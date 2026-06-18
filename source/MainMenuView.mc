@@ -95,10 +95,10 @@ class MainMenuDelegate extends WatchUi.BehaviorDelegate {
     function onSelect() {
         System.println("onSelect");
         var label = _view._types[_view._selectedIndex];
-        var menuView = new WorkoutTypeMenu(label);
+        var previewView = new WorkoutPreviewView(label);
         WatchUi.pushView(
-            menuView,
-            new WorkoutTypeDelegate(menuView),
+            previewView,
+            new WorkoutPreviewDelegate(previewView),
             WatchUi.SLIDE_IMMEDIATE
         );
         return true;

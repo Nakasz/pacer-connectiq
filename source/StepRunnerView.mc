@@ -1,6 +1,6 @@
 // StepRunnerView.mc — Static step-by-step workout runner
 // View + BehaviorDelegate
-// All target labels use concrete HR/pace, no zone notation
+// One step per screen, concrete HR/pace, safe area layout
 
 using Toybox.WatchUi;
 using Toybox.Graphics as Gfx;
@@ -31,82 +31,56 @@ class StepRunnerView extends WatchUi.View {
 
         // ---- Header: workout type ----
         dc.setColor(0xD4A84B, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, 18, Gfx.FONT_SYSTEM_MEDIUM, _type, Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(w / 2, 16, Gfx.FONT_SYSTEM_MEDIUM, _type, Gfx.TEXT_JUSTIFY_CENTER);
 
         // ---- Step counter ----
-        var stepNum = _currentStep + 1;
-        var stepStr = stepNum.format("%d") + " / " + _numSteps.format("%d");
+        var stepStr = (_currentStep + 1).format("%d") + "/" + _numSteps.format("%d");
         dc.setColor(0x666666, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, 48, Gfx.FONT_SYSTEM_TINY, stepStr, Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(w / 2, 44, Gfx.FONT_SYSTEM_XTINY, stepStr, Gfx.TEXT_JUSTIFY_CENTER);
 
         // ---- Divider ----
-        dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
-        dc.drawLine(40, 65, w - 40, 65);
+        dc.setColor(0x3A3A3A, Gfx.COLOR_TRANSPARENT);
+        dc.drawLine(45, 62, w - 45, 62);
 
         if (_currentStep < _numSteps) {
-            var idx = 1 + _currentStep * 3;
+            var idx  = 1 + _currentStep * 3;
             var name = _steps[idx];
             var dur  = _steps[idx + 1];
             var tgt  = _steps[idx + 2];
 
-            // ---- Big step name ----
+            // ---- Step name ----
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, 85, Gfx.FONT_SYSTEM_MEDIUM, name, Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(w / 2, 82, Gfx.FONT_SYSTEM_MEDIUM, name, Gfx.TEXT_JUSTIFY_CENTER);
 
-            // ---- Big duration display ----
+            // ---- Duration ----
             dc.setColor(0xD4A84B, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, 125, Gfx.FONT_SYSTEM_LARGE, dur, Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(w / 2, 120, Gfx.FONT_SYSTEM_MEDIUM, dur, Gfx.TEXT_JUSTIFY_CENTER);
 
             // ---- Target label (HR or pace) ----
             dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, 170, Gfx.FONT_SYSTEM_SMALL, tgt, Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(w / 2, 160, Gfx.FONT_SYSTEM_SMALL, tgt, Gfx.TEXT_JUSTIFY_CENTER);
 
             // ---- Navigation hint ----
             var isLastStep = (_currentStep == _numSteps - 1);
 
             dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
             if (isLastStep) {
-                dc.drawText(w / 2, h - 62, Gfx.FONT_SYSTEM_XTINY, "START finish  BACK", Gfx.TEXT_JUSTIFY_CENTER);
+                dc.drawText(w / 2, h - 45, Gfx.FONT_SYSTEM_XTINY, "START finish  BACK", Gfx.TEXT_JUSTIFY_CENTER);
             } else {
-                dc.drawText(w / 2, h - 62, Gfx.FONT_SYSTEM_XTINY, "START next  BACK", Gfx.TEXT_JUSTIFY_CENTER);
+                dc.drawText(w / 2, h - 45, Gfx.FONT_SYSTEM_XTINY, "START next  BACK", Gfx.TEXT_JUSTIFY_CENTER);
             }
 
         } else {
             // ---- All steps complete ----
             dc.setColor(0xD4A84B, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, h / 2 - 20, Gfx.FONT_SYSTEM_LARGE, "Done!", Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(w / 2, h / 2 - 24, Gfx.FONT_SYSTEM_MEDIUM, "Done!", Gfx.TEXT_JUSTIFY_CENTER);
 
             dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, h / 2 + 20, Gfx.FONT_SYSTEM_SMALL, "Great work today", Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(w / 2, h / 2 + 8, Gfx.FONT_SYSTEM_SMALL, "Great work", Gfx.TEXT_JUSTIFY_CENTER);
 
             dc.setColor(0x444444, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, h - 62, Gfx.FONT_SYSTEM_XTINY, "START restart  BACK", Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(w / 2, h - 45, Gfx.FONT_SYSTEM_XTINY, "START restart  BACK", Gfx.TEXT_JUSTIFY_CENTER);
         }
-    }
-
-    function onTap(clickEvent) {
-        var coords = clickEvent.getCoordinates();
-        var y = coords[1];
-        var h = System.getDeviceSettings().screenHeight;
-
-        // Bottom area = next step / finish
-        if (y > h * 0.7) {
-            if (_currentStep >= _numSteps) {
-                _currentStep = 0;
-            } else {
-                _currentStep++;
-            }
-            WatchUi.requestUpdate();
-            return true;
-        }
-
-        // Top area = pop back
-        if (y < 60) {
-            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
-            return true;
-        }
-
-        return false;
     }
 }
 
@@ -145,9 +119,5 @@ class StepRunnerDelegate extends WatchUi.BehaviorDelegate {
         System.println("onBack");
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
-    }
-
-    function onTap(clickEvent) {
-        return _view.onTap(clickEvent);
     }
 }
